@@ -1,7 +1,3 @@
-![License](https://img.shields.io/github/license/HerrTaeubler/VBots-v2-playerbotaddon)
-![Language](https://img.shields.io/github/languages/top/HerrTaeubler/VBots-v2-playerbotaddon)
-![Last Commit](https://img.shields.io/github/last-commit/HerrTaeubler/VBots-v2-playerbotaddon)
-
 # VBots v2 playerbotaddon
 
 A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user interface and enhanced functionality.
@@ -22,9 +18,15 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 3. Rename the folder to `vbots`
 4. Restart World of Warcraft if it's running
 
-## New in v2.1
+## New in v2.2
+- Fixed the Spec Template options, which didn't work at all previously
 
-![UI](https://raw.githubusercontent.com/HerrTaeubler/VBots-v2-playerbotaddon/main/botui.jpg)
+## Features
+
+UI
+
+![VBot UI](https://github.com/user-attachments/assets/88686573-20cf-4ce1-93ca-73165f108803)
+
 
 ### Temporary Bot Support
 - Added support for temporary bots in battlegrounds
@@ -109,6 +111,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
 
 ## Credits
+- This addon was first made by HerrTaeubler
 - Original addon by coolzoom: https://github.com/coolzoom/vmangos-pbotaddon/tree/master
 - Battleground fill system inspired by Digital Scriptorium: https://www.youtube.com/@Digital-Scriptorium
 - Special thanks to Celguar for providing the chat message parsing code that enables template detection and auto-population of the dropdown menu: https://github.com/celguar/
