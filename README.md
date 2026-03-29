@@ -116,7 +116,7 @@ https://github.com/IamTirion/core/tree/partybot-cross-faction-class
 
 
 ## Credits
-- This addon was first made by HerrTaeubler
+- This addon was first made by minzi90
 - Original addon by coolzoom: https://github.com/coolzoom/vmangos-pbotaddon/tree/master
 - Battleground fill system inspired by Digital Scriptorium: https://www.youtube.com/@Digital-Scriptorium
 - Special thanks to Celguar for providing the chat message parsing code that enables template detection and auto-population of the dropdown menu: https://github.com/celguar/
