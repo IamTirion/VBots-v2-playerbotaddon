@@ -269,7 +269,10 @@ function vbotsButtonFrame_OnEnter()
 end
 
 
-local templates = {}
+local gearTemplates = {}
+local specTemplates = {}
+local currentTemplateType = nil  -- "gear" or "spec" during scan
+local activeTemplateType = "gear"  -- what the dropdown currently shows
 
 
 function InitializeFactionClassButton()
@@ -295,11 +298,16 @@ f:SetScript("OnEvent", function()
     local message = arg1
 
     if event == "CHAT_MSG_SYSTEM" and message then    
-        if isLookingForTemplates then
+    if isLookingForTemplates then
             if string.find(message, "^%d+%s*-%s*") then
                 local _, _, id, name = string.find(message, "^(%d+)%s*-%s*([^%(]+)")
                 if id and name then
-                    templates[id] = name
+                    if currentTemplateType == "gear" then
+                        gearTemplates[id] = name
+                    elseif currentTemplateType == "spec" then
+                        specTemplates[id] = name
+                    end
+                    -- Refresh the dropdown after each new template
                     local dropdown = getglobal("vbotsTemplateDropDown")
                     if dropdown then
                         UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
@@ -308,7 +316,7 @@ f:SetScript("OnEvent", function()
             end
             
             if string.find(message, "Listing available premade templates") then
-                templates = {}
+                -- Tables already cleared in the button click
             end
         end
     end
@@ -324,13 +332,17 @@ end)
 
 function TemplateDropDown_Initialize()
     local info = {}
-    -- Add header
-    info.text = "Select Template"
+    if activeTemplateType == "gear" then
+        info.text = "Select Gear Template"
+    else
+        info.text = "Select Spec Template"
+    end
     info.notClickable = 1
     info.isTitle = 1
     UIDropDownMenu_AddButton(info)
 
-    
+    local templates = (activeTemplateType == "gear") and gearTemplates or specTemplates
+
     for id, name in pairs(templates) do
         info = {}
         info.text = id .. " - " .. name
@@ -343,12 +355,21 @@ end
 
 function TemplateDropDown_OnClick()
     local id = this.value
+    local templates = (activeTemplateType == "gear") and gearTemplates or specTemplates
     local name = templates[id]
+
     if id and name then
-        SendChatMessage(".character premade gear " .. id)
-        local dropdownText = getglobal("vbotsTemplateDropDown".."Text")
-        if dropdownText then
-            dropdownText:SetText(id .. " - " .. name)
+        if activeTemplateType == "gear" then
+            SendChatMessage(".character premade gear " .. id)
+        else
+            SendChatMessage(".character premade spec " .. id)
+        end
+
+        -- Update the dropdown's displayed text
+        local dropdownName = this:GetParent():GetName()
+        local textField = getglobal(dropdownName .. "Text")
+        if textField then
+            textField:SetText(id .. " - " .. name)
         end
     end
 end
@@ -483,13 +504,24 @@ end
 
 
 function GearTemplateButtonClick()
-    templates = {} 
+    activeTemplateType = "gear"
+    currentTemplateType = "gear"
+    gearTemplates = {}
     StartTemplateScan()
     SendChatMessage(CMD_PARTYBOT_GEAR)
 end
 
 function SpecTemplateButtonClick()
-    templates = {} 
+    activeTemplateType = "spec"
+    currentTemplateType = "spec"
+    specTemplates = {}
     StartTemplateScan()
     SendChatMessage(CMD_PARTYBOT_SPEC)
+end
+
+-- Initialize dropdown with gear templates by default
+local dropdown = getglobal("vbotsGearTemplateDropDown")  -- change name if needed
+if dropdown then
+    UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
+    getglobal(dropdown:GetName() .. "Text"):SetText("Select Template")
 end
