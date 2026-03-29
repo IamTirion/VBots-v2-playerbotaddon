@@ -23,7 +23,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
 ## Features
 
-UI
+### UI
 
 ![VBot UI](https://github.com/user-attachments/assets/88686573-20cf-4ce1-93ca-73165f108803)
 
