@@ -1,6 +1,3 @@
-![License] MIT License
-![Language]English
-
 # VBots v2 playerbotaddon
 
 A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user interface and enhanced functionality.
