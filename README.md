@@ -21,12 +21,8 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 ## Changelogs
 # v2.3
 - Added the "Add Paladin" and "Add Shaman" buttons for everyone. You won't be able to use the other faction's button normally. 
-But if you disable pPlayer->GetTeam() == ALLIANCE)
-and
-pPlayer->GetTeam() == HORDE)
-in
-PlayerBotMgr.cpp
-in the VMaNGOS source code, you will be able to summon the other faction's class.
+But you can use this patch to make it possible
+https://github.com/IamTirion/core/tree/partybot-cross-faction-class
 # v2.2
 - Fixed the Spec Template options, which didn't work at all previously
 
