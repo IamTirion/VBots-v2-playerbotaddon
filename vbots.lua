@@ -1,5 +1,5 @@
 -- Create Date : 2020/5/12 10:00:00 by coolzoom https://github.com/coolzoom/vmangos-pbotaddon/tree/master
--- Remaster Date : 2025/2/23 15:31:24 by minzi90 https://github.com/minzi90/vmangos-pbotaddon
+-- Remaster Date : 2026/3/29 15:31:24 by IamTirion https://github.com/IamTirion/VBots-v2-playerbotaddon
 -- Constants moved to top and grouped logically
 local ADDON_NAME = "VBots"
 

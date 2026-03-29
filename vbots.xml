@@ -114,7 +114,7 @@
 		
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="vbotsCredit" inherits="GameFontNormalSmall" text="vbots v2 beta">
+				<FontString name="vbotsCredit" inherits="GameFontNormalSmall" text="vbots v2.2 beta">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" relativeTo="$parent">
 							<Offset>
