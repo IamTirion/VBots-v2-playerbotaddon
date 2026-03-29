@@ -385,8 +385,7 @@
 						</Scripts>
 					</Button>
 
-					<!-- Faction-specific class button -->
-					<Button name="PartyBotAddFactionClass" inherits="UIPanelButtonTemplate">
+					<Button name="PartyBotAddPaladin" inherits="UIPanelButtonTemplate" text="Add Paladin">
 						<Size x="90" y="20"/>
 						<Anchors>
 							<Anchor point="TOP" relativeTo="PartyBotAddDruid" relativePoint="BOTTOM">
@@ -396,17 +395,24 @@
 							</Anchor>
 						</Anchors>
 						<Scripts>
-							<OnLoad>
-								-- Don't try to set text here, it will be set by InitializeFactionClassButton
-								this:SetText("Loading...")
-							</OnLoad>
 							<OnClick>
-								local faction = GetPlayerFaction()  
-								if faction == "alliance" then
-									SubPartyBotAdd(this, "paladin");
-								else
-									SubPartyBotAdd(this, "shaman");
-								end
+								SubPartyBotAdd(self, "paladin");
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotAddShaman" inherits="UIPanelButtonTemplate" text="Add Shaman">
+						<Size x="90" y="20"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotAddPaladin" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								SubPartyBotAdd(self, "shaman");
 							</OnClick>
 						</Scripts>
 					</Button>
