@@ -18,6 +18,7 @@ CMD_PARTYBOT_CLONE = ".partybot clone"
 CMD_PARTYBOT_REMOVE = ".partybot remove"
 CMD_PARTYBOT_ADD = ".partybot add "
 CMD_PARTYBOT_SETROLE = ".partybot setrole "
+CMD_PARTYBOT_GETROLE = ".partybot getrole"
 CMD_PARTYBOT_GEAR = ".character premade gear "
 CMD_PARTYBOT_SPEC = ".character premade spec "
 
@@ -174,6 +175,10 @@ end
 
 function SubPartyBotSetRole(self, arg)
     SendChatMessage(CMD_PARTYBOT_SETROLE .. arg)
+end
+
+function SubPartyBotGetRole()
+    SendChatMessage(CMD_PARTYBOT_GETROLE)
 end
 
 function SubPartyBotAdd(self, arg)
