@@ -66,7 +66,7 @@
 	</Frame>
 	
 	<Frame name="vbotsFrame" parent="UIParent" toplevel="true" movable="true" enableMouse="true">
-		<Size x="350" y="220" />
+		<Size x="350" y="280" />
 		<Anchors>
 			<Anchor point="CENTER">
 				<Offset>
@@ -236,20 +236,7 @@
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<!-- Assign role Text -->
-				<Layers>
-					<Layer level="OVERLAY">
-						<FontString name="partybotsetrole" inherits="GameFontNormal" text="Assign role:">
-							<Anchors>
-								<Anchor point="BOTTOM" relativeTo="$parent">
-									<Offset>
-										<AbsDimension x="0" y="20"/>
-									</Offset>
-								</Anchor>
-							</Anchors>
-						</FontString>
-					</Layer>
-				</Layers>
+
 				<Frames>
 					<!-- Left Column -->
 					<Button name="PartyBotAddWarrior" inherits="UIPanelButtonTemplate" text="Add Warrior">
@@ -467,9 +454,9 @@
 					<Button name="PartyBotGetRole" inherits="UIPanelButtonTemplate" text="Get Role">
 						<Size x="70" y="22"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="partybotsetrole" relativePoint="TOP">
+							<Anchor point="TOP" relativeTo="PartyBotClone" relativePoint="BOTTOM">
 								<Offset>
-									<AbsDimension x="0" y="20"/>
+									<AbsDimension x="0" y="-25"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -478,13 +465,27 @@
 								SubPartyBotGetRole();
 							</OnClick>
 						</Scripts>
+						<!-- Assign role Text -->
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="partybotsetrole" inherits="GameFontNormal" text="Assign role:">
+									<Anchors>
+										<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
+											<Offset>
+												<AbsDimension x="0" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
 					</Button>
 					<!-- Role Buttons -->
 					<Button name="PartyBotSetTank" inherits="UIPanelButtonTemplate" text="Tank">
 						<Size x="70" y="20"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="partybotsetrole" relativePoint="BOTTOM">
-								<Offset><AbsDimension x="-75" y="-5"/></Offset>
+							<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="-75" y="-20"/></Offset>
 							</Anchor>
 						</Anchors>
 						<Scripts>
@@ -495,8 +496,8 @@
 					<Button name="PartyBotSetDPS" inherits="UIPanelButtonTemplate" text="DPS">
 						<Size x="70" y="20"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="partybotsetrole" relativePoint="BOTTOM">
-								<Offset><AbsDimension x="0" y="-5"/></Offset>
+							<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="0" y="-20"/></Offset>
 							</Anchor>
 						</Anchors>
 						<Scripts>
@@ -507,8 +508,8 @@
 					<Button name="PartyBotSetHealer" inherits="UIPanelButtonTemplate" text="Heal">
 						<Size x="70" y="20"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="partybotsetrole" relativePoint="BOTTOM">
-								<Offset><AbsDimension x="75" y="-5"/></Offset>
+							<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
+								<Offset><AbsDimension x="75" y="-20"/></Offset>
 							</Anchor>
 						</Anchors>
 						<Scripts>
