@@ -276,8 +276,9 @@ end
 
 local gearTemplates = {}
 local specTemplates = {}
+selectedGearTemplateId = nil
+selectedSpecTemplateId = nil
 local currentTemplateType = nil  -- "gear" or "spec" during scan
-local activeTemplateType = "gear"  -- what the dropdown currently shows
 
 
 function InitializeFactionClassButton()
@@ -303,26 +304,28 @@ f:SetScript("OnEvent", function()
     local message = arg1
 
     if event == "CHAT_MSG_SYSTEM" and message then    
-    if isLookingForTemplates then
+        if isLookingForTemplates then
             if string.find(message, "^%d+%s*-%s*") then
                 local _, _, id, name = string.find(message, "^(%d+)%s*-%s*([^%(]+)")
                 if id and name then
                     if currentTemplateType == "gear" then
                         gearTemplates[id] = name
+                        -- Refresh gear dropdown
+                        local dropdown = getglobal("vbotsGearDropDown")
+                        if dropdown then
+                            UIDropDownMenu_Initialize(dropdown, GearDropDown_Initialize)
+                        end
                     elseif currentTemplateType == "spec" then
                         specTemplates[id] = name
-                    end
-                    -- Refresh the dropdown after each new template
-                    local dropdown = getglobal("vbotsTemplateDropDown")
-                    if dropdown then
-                        UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
+                        -- Refresh spec dropdown
+                        local dropdown = getglobal("vbotsSpecDropDown")
+                        if dropdown then
+                            UIDropDownMenu_Initialize(dropdown, SpecDropDown_Initialize)
+                        end
                     end
                 end
             end
-            
-            if string.find(message, "Listing available premade templates") then
-                -- Tables already cleared in the button click
-            end
+            -- Optional: detect end of listing if server sends a message
         end
     end
 
@@ -335,47 +338,70 @@ f:SetScript("OnEvent", function()
 end)
 
 
-function TemplateDropDown_Initialize()
+function GearDropDown_Initialize()
     local info = {}
-    if activeTemplateType == "gear" then
-        info.text = "Select Gear Template"
-    else
-        info.text = "Select Spec Template"
-    end
+    info.text = "Gear Templates"
     info.notClickable = 1
     info.isTitle = 1
     UIDropDownMenu_AddButton(info)
-
-    local templates = (activeTemplateType == "gear") and gearTemplates or specTemplates
-
-    for id, name in pairs(templates) do
+    
+    for id, name in pairs(gearTemplates) do
         info = {}
         info.text = id .. " - " .. name
-        info.func = TemplateDropDown_OnClick
+        info.func = GearDropDown_OnClick
+        info.value = id
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+function SpecDropDown_Initialize()
+    local info = {}
+    info.text = "Spec Templates"
+    info.notClickable = 1
+    info.isTitle = 1
+    UIDropDownMenu_AddButton(info)
+    
+    for id, name in pairs(specTemplates) do
+        info = {}
+        info.text = id .. " - " .. name
+        info.func = SpecDropDown_OnClick
         info.value = id
         UIDropDownMenu_AddButton(info)
     end
 end
 
 
-function TemplateDropDown_OnClick()
+function GearDropDown_OnClick()
     local id = this.value
-    local templates = (activeTemplateType == "gear") and gearTemplates or specTemplates
-    local name = templates[id]
-
+    local name = gearTemplates[id]
     if id and name then
-        if activeTemplateType == "gear" then
-            SendChatMessage(".character premade gear " .. id)
-        else
-            SendChatMessage(".character premade spec " .. id)
+        selectedGearTemplateId = id
+        -- Update dropdown display text
+        local dropdown = getglobal("vbotsGearDropDown")
+        if dropdown then
+            local textField = getglobal(dropdown:GetName() .. "Text")
+            if textField then
+                textField:SetText(id .. " - " .. name)
+            end
         end
+        DEFAULT_CHAT_FRAME:AddMessage("Gear template selected: " .. id .. " - " .. name .. " (click Apply Gear to equip)")
+    end
+end
 
-        -- Update the dropdown's displayed text
-        local dropdownName = this:GetParent():GetName()
-        local textField = getglobal(dropdownName .. "Text")
-        if textField then
-            textField:SetText(id .. " - " .. name)
+function SpecDropDown_OnClick()
+    local id = this.value
+    local name = specTemplates[id]
+    if id and name then
+        selectedSpecTemplateId = id
+        -- Update dropdown display text
+        local dropdown = getglobal("vbotsSpecDropDown")
+        if dropdown then
+            local textField = getglobal(dropdown:GetName() .. "Text")
+            if textField then
+                textField:SetText(id .. " - " .. name)
+            end
         end
+        DEFAULT_CHAT_FRAME:AddMessage("Spec template selected: " .. id .. " - " .. name .. " (click Apply Spec to learn talents)")
     end
 end
 
@@ -509,7 +535,6 @@ end
 
 
 function GearTemplateButtonClick()
-    activeTemplateType = "gear"
     currentTemplateType = "gear"
     gearTemplates = {}
     StartTemplateScan()
@@ -517,16 +542,96 @@ function GearTemplateButtonClick()
 end
 
 function SpecTemplateButtonClick()
-    activeTemplateType = "spec"
     currentTemplateType = "spec"
     specTemplates = {}
     StartTemplateScan()
     SendChatMessage(CMD_PARTYBOT_SPEC)
 end
 
--- Initialize dropdown with gear templates by default
-local dropdown = getglobal("vbotsGearTemplateDropDown")  -- change name if needed
-if dropdown then
-    UIDropDownMenu_Initialize(dropdown, TemplateDropDown_Initialize)
-    getglobal(dropdown:GetName() .. "Text"):SetText("Select Template")
+--- Gear delete popup
+VBots_GearToDelete = nil
+
+StaticPopupDialogs["CONFIRM_DELETE_GEAR_TEMPLATE"] = {
+    text = "Are you sure you want to delete gear template \"%s\"?",
+    button1 = "Yes",
+    button2 = "No",
+    OnAccept = function()
+        if VBots_GearToDelete then
+            SendChatMessage(".character premade deletegear " .. VBots_GearToDelete)
+            VBots_GearToDelete = nil
+            selectedGearTemplateId = nil
+            local dropdown = getglobal("vbotsGearDropDown")
+            if dropdown then
+                local textField = getglobal(dropdown:GetName() .. "Text")
+                if textField then
+                    textField:SetText("Select Gear Template")
+                end
+            end
+            GearTemplateButtonClick()
+        end
+    end,
+    OnCancel = function()
+        VBots_GearToDelete = nil
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
+
+function DeleteGearTemplate()
+    if not selectedGearTemplateId then
+        DEFAULT_CHAT_FRAME:AddMessage("No gear template selected. Please select one from the Gear dropdown.")
+        return
+    end
+    local name = gearTemplates[selectedGearTemplateId]
+    if not name then
+        DEFAULT_CHAT_FRAME:AddMessage("Error: Could not find template name.")
+        return
+    end
+    VBots_GearToDelete = name
+    StaticPopup_Show("CONFIRM_DELETE_GEAR_TEMPLATE", name)
+end
+
+-- Spec delete popup
+VBots_SpecToDelete = nil
+
+StaticPopupDialogs["CONFIRM_DELETE_SPEC_TEMPLATE"] = {
+    text = "Are you sure you want to delete spec template \"%s\"?",
+    button1 = "Yes",
+    button2 = "No",
+    OnAccept = function()
+        if VBots_SpecToDelete then
+            SendChatMessage(".character premade deletespec " .. VBots_SpecToDelete)
+            VBots_SpecToDelete = nil
+            selectedSpecTemplateId = nil
+            local dropdown = getglobal("vbotsSpecDropDown")
+            if dropdown then
+                local textField = getglobal(dropdown:GetName() .. "Text")
+                if textField then
+                    textField:SetText("Select Spec Template")
+                end
+            end
+            SpecTemplateButtonClick()
+        end
+    end,
+    OnCancel = function()
+        VBots_SpecToDelete = nil
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+}
+
+function DeleteSpecTemplate()
+    if not selectedSpecTemplateId then
+        DEFAULT_CHAT_FRAME:AddMessage("No spec template selected. Please select one from the Spec dropdown.")
+        return
+    end
+    local name = specTemplates[selectedSpecTemplateId]
+    if not name then
+        DEFAULT_CHAT_FRAME:AddMessage("Error: Could not find template name.")
+        return
+    end
+    VBots_SpecToDelete = name
+    StaticPopup_Show("CONFIRM_DELETE_SPEC_TEMPLATE", name)
 end
