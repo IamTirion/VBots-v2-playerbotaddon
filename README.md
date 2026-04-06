@@ -15,19 +15,20 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 ## Installation
 1. Download the addon
 2. Extract to your `World of Warcraft/Interface/AddOns` folder
-3. Rename the folder to `vbots`
-4. Restart World of Warcraft if it's running
+3. Restart World of Warcraft if it's running
 
 ## Changelogs
 # v2.2
+- Changed how the Template panel works. Now you press Refresh Gear or Refresh Spec, then select a template, then click Apply Gear or Apply Spec to apply them.
+- Added Delete Gear and Delete Spec buttons to delete templates. Requires custom patch
 - Added the Esc button to cancel typing in the Template Name box
-- Added a Get Role button, to check the current role of a bot.
-  Requires my patch https://github.com/IamTirion/core/tree/all-changes-classes-changes
-  Because the commmands for these buttons do not exist on the official VMANGOS version
-- Added the "Add Paladin" and "Add Shaman" buttons for everyone. You won't be able to use the other faction's button normally. 
-But you can use this patch to make it possible
-https://github.com/IamTirion/core/tree/partybot-cross-faction-class
+- Added a Get Role button, to check the current role of a bot
+- Added the "Add Paladin" and "Add Shaman" buttons for everyone. You won't be able to use the other faction's button normally. Requires custom patch
 - Fixed the Spec Template options, which didn't work at all previously
+
+  Custom patch
+  https://github.com/IamTirion/core/tree/all-changes-classes-changes
+  You can pick out the custom commands from this patch and apply it to the official VMANGOS version if you know what you are doing.
 
 ## Features
 
