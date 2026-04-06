@@ -34,7 +34,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
 ### UI
 
-![VBot UI](https://github.com/user-attachments/assets/88686573-20cf-4ce1-93ca-73165f108803)
+![VBot 2 2 UI](https://github.com/user-attachments/assets/13a9fc5e-103a-4c14-bdfe-b88f357960d5)
 
 
 ### Temporary Bot Support
