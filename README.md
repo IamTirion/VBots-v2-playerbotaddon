@@ -28,7 +28,10 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
   Custom patch
   https://github.com/IamTirion/core/tree/all-changes-classes-changes
-  You can pick out the custom commands from this patch and apply it to the official VMANGOS version if you know what you are doing.
+  The patch contains a huge number of things that are not accepted into the official VMANGOS. 
+  They are mainly changes to bots behaviour, more items on the GM Island vendors, and the World Buffs npc being able to buff the whole group.
+  But if you just want the custom commands to use with this addon,
+  you can pick out the custom commands from this patch and apply it to the official VMANGOS version if you know what you are doing.
 
 ## Features
 
