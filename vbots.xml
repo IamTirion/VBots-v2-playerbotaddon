@@ -472,7 +472,7 @@
 									<Anchors>
 										<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
 											<Offset>
-												<AbsDimension x="0" y="-5"/>
+												<AbsDimension x="0" y="-3"/>
 											</Offset>
 										</Anchor>
 									</Anchors>
@@ -1033,6 +1033,9 @@
 									this:SetTextColor(0.5, 0.5, 0.5);
 								end
 							</OnEditFocusLost>
+							 <OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
 						</Scripts>
 						<FontString inherits="ChatFontNormal"/>
 					</EditBox>
