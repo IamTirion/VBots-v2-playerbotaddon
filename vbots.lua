@@ -57,7 +57,7 @@ local CommandQueue = {
 
 
 local MinimapButton = {
-    shown = true,
+    shown = false,
     position = VBotsDB.minimapButtonPosition or 268,
     radius = 78,
     cos = math.cos,
