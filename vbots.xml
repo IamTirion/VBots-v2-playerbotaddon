@@ -114,7 +114,7 @@
 		
 		<Layers>
 			<Layer level="OVERLAY">
-				<FontString name="vbotsCredit" inherits="GameFontNormalSmall" text="vbots v2.3 beta">
+				<FontString name="vbotsCredit" inherits="GameFontNormalSmall" text="vbots v2.2">
 					<Anchors>
 						<Anchor point="BOTTOMRIGHT" relativeTo="$parent">
 							<Offset>
@@ -888,31 +888,49 @@
 					</Anchor>
 				</Anchors>
 				<Frames>
-					<!-- Template selection dropdown -->
-					<Frame name="vbotsTemplateDropDown" inherits="UIDropDownMenuTemplate">
+					<!-- Gear Template Dropdown -->
+					<Frame name="vbotsGearDropDown" inherits="UIDropDownMenuTemplate">
 						<Anchors>
 							<Anchor point="TOP">
 								<Offset>
-									<AbsDimension x="0" y="-20"/>
+									<AbsDimension x="-80" y="-20"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								UIDropDownMenu_SetWidth(150);
-								UIDropDownMenu_Initialize(this, TemplateDropDown_Initialize);
-								getglobal(this:GetName().."Text"):SetText("Select Template");
+								UIDropDownMenu_SetWidth(140);
+								UIDropDownMenu_Initialize(this, GearDropDown_Initialize);
+								getglobal(this:GetName().."Text"):SetText("Select Gear Template");
 							</OnLoad>
 						</Scripts>
 					</Frame>
 
-					<!-- Gear/Spec Template buttons -->
-					<Button name="vbotsGearButton" inherits="UIPanelButtonTemplate" text="Gear Template">
-						<Size x="110" y="25"/>
+					<!-- Spec Template Dropdown -->
+					<Frame name="vbotsSpecDropDown" inherits="UIDropDownMenuTemplate">
 						<Anchors>
-							<Anchor point="TOP" relativeTo="vbotsTemplateDropDown" relativePoint="BOTTOM">
+							<Anchor point="TOP">
 								<Offset>
-									<AbsDimension x="-60" y="-10"/>
+									<AbsDimension x="80" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								UIDropDownMenu_SetWidth(140);
+								UIDropDownMenu_Initialize(this, SpecDropDown_Initialize);
+								getglobal(this:GetName().."Text"):SetText("Select Spec Template");
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					<!-- Refresh Gear button -->
+					<Button name="vbotsRefreshGearButton" inherits="UIPanelButtonTemplate" text="Refresh Gear">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsGearDropDown" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -923,12 +941,52 @@
 						</Scripts>
 					</Button>
 
-					<Button name="vbotsSpecButton" inherits="UIPanelButtonTemplate" text="Spec Template">
-						<Size x="110" y="25"/>
+					<!-- Apply Gear button -->
+					<Button name="vbotsApplyGearButton" inherits="UIPanelButtonTemplate" text="Apply Gear">
+						<Size x="100" y="22"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="vbotsTemplateDropDown" relativePoint="BOTTOM">
+							<Anchor point="TOP" relativeTo="vbotsRefreshGearButton" relativePoint="BOTTOM">
 								<Offset>
-									<AbsDimension x="60" y="-10"/>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if selectedGearTemplateId then
+									SendChatMessage(".character premade gear " .. selectedGearTemplateId)
+									DEFAULT_CHAT_FRAME:AddMessage("Applying gear template ID: " .. selectedGearTemplateId)
+								else
+									DEFAULT_CHAT_FRAME:AddMessage("No gear template selected. Choose one from the dropdown first.")
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Delete Gear button -->
+					<Button name="vbotsDeleteGearButton" inherits="UIPanelButtonTemplate" text="Delete Gear">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsApplyGearButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								DeleteGearTemplate();
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Refresh Spec button -->
+					<Button name="vbotsRefreshSpecButton" inherits="UIPanelButtonTemplate" text="Refresh Spec">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsSpecDropDown" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
@@ -939,11 +997,50 @@
 						</Scripts>
 					</Button>
 
-					<!-- Save buttons -->
-					<Button name="vbotsSaveGearButton" inherits="UIPanelButtonTemplate" text="Save Gear">
-						<Size x="110" y="25"/>
+					<!-- Apply Spec button -->
+					<Button name="vbotsApplySpecButton" inherits="UIPanelButtonTemplate" text="Apply Spec">
+						<Size x="100" y="22"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="vbotsGearButton" relativePoint="BOTTOM">
+							<Anchor point="TOP" relativeTo="vbotsRefreshSpecButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if selectedSpecTemplateId then
+									SendChatMessage(".character premade spec " .. selectedSpecTemplateId)
+									DEFAULT_CHAT_FRAME:AddMessage("Applying spec template ID: " .. selectedSpecTemplateId)
+								else
+									DEFAULT_CHAT_FRAME:AddMessage("No spec template selected. Choose one from the dropdown first.")
+								end
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Delete Spec button -->
+					<Button name="vbotsDeleteSpecButton" inherits="UIPanelButtonTemplate" text="Delete Spec">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsApplySpecButton" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								DeleteSpecTemplate();
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<!-- Save Gear button -->
+					<Button name="vbotsSaveGearButton" inherits="UIPanelButtonTemplate" text="Save Gear">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="vbotsDeleteGearButton" relativePoint="BOTTOM">
 								<Offset>
 									<AbsDimension x="0" y="-5"/>
 								</Offset>
@@ -961,10 +1058,11 @@
 						</Scripts>
 					</Button>
 
+					<!-- Save Spec button -->
 					<Button name="vbotsSaveSpecButton" inherits="UIPanelButtonTemplate" text="Save Spec">
-						<Size x="110" y="25"/>
+						<Size x="100" y="22"/>
 						<Anchors>
-							<Anchor point="TOP" relativeTo="vbotsSpecButton" relativePoint="BOTTOM">
+							<Anchor point="TOP" relativeTo="vbotsDeleteSpecButton" relativePoint="BOTTOM">
 								<Offset>
 									<AbsDimension x="0" y="-5"/>
 								</Offset>
@@ -990,7 +1088,7 @@
 						<Anchors>
 							<Anchor point="TOP" relativeTo="vbotsSaveGearButton" relativePoint="BOTTOM">
 								<Offset>
-									<AbsDimension x="60" y="-15"/>
+									<AbsDimension x="80" y="-15"/>
 								</Offset>
 							</Anchor>
 						</Anchors>
