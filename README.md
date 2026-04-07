@@ -19,6 +19,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
 ## Changelogs
 # v2.2
+- Added the "Use Object" button. It summons the bots to you first, before they try to use the object near you. It is buggy, but the commands themselves are buggy. It still works eventually.
 - Added the "Load Bots" button, allowing you to save a list of bot names and load them. Requires the bots to have been created, and each bot has to be on its own account
 - Changed how the Template panel works. Now you press Refresh Gear or Refresh Spec, then select a template, then click Apply Gear or Apply Spec to apply them
 - Added Delete Gear and Delete Spec buttons to delete templates. Requires custom patch
