@@ -774,3 +774,11 @@ function DeleteSelectedPreset()
         UIDropDownMenu_Initialize(dropdown, PresetDropDown_Initialize)
     end
 end
+
+function UseObjectCommand()
+    -- Queue the three commands in order
+    QueueCommand(".partybot cometome")
+    QueueCommand(".gobject select")
+    QueueCommand(".partybot usegobject")
+    DEFAULT_CHAT_FRAME:AddMessage("Queued: cometome -> select object -> use object")
+end
