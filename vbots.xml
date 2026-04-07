@@ -635,6 +635,23 @@
 						</Scripts>
 					</Button>
 
+					<!-- Use Object button -->
+					<Button name="PartyBotUseObject" inherits="UIPanelButtonTemplate" text="Use Object">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="PartyBotComeToMe" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								UseObjectCommand();
+							</OnClick>
+						</Scripts>
+					</Button>
+
 					<!-- Right Column -->
 					<Button name="PartyBotAttackStop" inherits="UIPanelButtonTemplate" text="Stop Combat">
 						<Size x="100" y="22"/>
