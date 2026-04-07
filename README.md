@@ -23,7 +23,7 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 - Added the "Load Bots" button, allowing you to save a list of bot names and load them. Requires the bots to have been created, and each bot has to be on its own account
 - Changed how the Template panel works. Now you press Refresh Gear or Refresh Spec, then select a template, then click Apply Gear or Apply Spec to apply them
 - Added Delete Gear and Delete Spec buttons to delete templates. Requires custom patch
-- Added the Esc button to cancel typing in the Template Name box
+- Added using the Esc button to cancel typing in the Template Name box
 - Added a Get Role button, to check the current role of a bot
 - Added the "Add Paladin" and "Add Shaman" buttons for everyone. You won't be able to use the other faction's button normally. Requires custom patch
 - Fixed the Spec Template options, which didn't work at all previously
