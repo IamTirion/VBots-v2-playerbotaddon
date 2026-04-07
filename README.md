@@ -19,7 +19,8 @@ A World of Warcraft 1.12.1 addon for vmangos bot commands with an improved user 
 
 ## Changelogs
 # v2.2
-- Changed how the Template panel works. Now you press Refresh Gear or Refresh Spec, then select a template, then click Apply Gear or Apply Spec to apply them.
+- Added the "Load Bots" button, allowing you to save a list of bot names and load them. Requires the bots to have been created, and each bot has to be on its own account
+- Changed how the Template panel works. Now you press Refresh Gear or Refresh Spec, then select a template, then click Apply Gear or Apply Spec to apply them
 - Added Delete Gear and Delete Spec buttons to delete templates. Requires custom patch
 - Added the Esc button to cancel typing in the Template Name box
 - Added a Get Role button, to check the current role of a bot
