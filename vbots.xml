@@ -465,10 +465,10 @@
 								SubPartyBotGetRole();
 							</OnClick>
 						</Scripts>
-						<!-- Assign role Text -->
+						<!-- Set role Text -->
 						<Layers>
 							<Layer level="OVERLAY">
-								<FontString name="partybotsetrole" inherits="GameFontNormal" text="Assign role:">
+								<FontString name="partybotsetrole" inherits="GameFontNormal" text="Set role:">
 									<Anchors>
 										<Anchor point="TOP" relativeTo="PartyBotGetRole" relativePoint="BOTTOM">
 											<Offset>
@@ -514,6 +514,26 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>SubPartyBotSetRole(self, "healer");</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="PartyBotOpenListFrame" inherits="UIPanelButtonTemplate" text="Load Bots">
+						<Size x="100" y="22"/>
+						<Anchors>
+							<Anchor point="BOTTOM" relativeTo="PartyBotSetDPS" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-30"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if not VBotsBotListFrame:IsShown() then
+									VBotsBotListFrame:Show();
+								else
+									VBotsBotListFrame:Hide();
+								end
+							</OnClick>
 						</Scripts>
 					</Button>
 				</Frames>
@@ -1163,6 +1183,241 @@
 					this:StopMovingOrSizing();
 				end
 			</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+	<!-- Load Bots Popup -->
+	<Frame name="VBotsBotListFrame" parent="UIParent" hidden="true" enableMouse="true" frameStrata="DIALOG">
+		<Size x="400" y="350"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" 
+				edgeFile="Interface\DialogFrame\UI-DialogBox-Border" 
+				tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+			<TileSize><AbsValue val="32"/></TileSize>
+			<EdgeSize><AbsValue val="32"/></EdgeSize>
+		</Backdrop>
+
+		<!-- Title -->
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTitleBG" file="Interface\DialogFrame\UI-DialogBox-Header">
+					<Size x="400" y="64"/>
+					<Anchors><Anchor point="TOP"><Offset x="0" y="12"/></Anchor></Anchors>
+				</Texture>
+				<FontString name="$parentTitle" inherits="GameFontNormal" text="Bot List Manager">
+					<Anchors><Anchor point="TOP"><Offset x="0" y="0"/></Anchor></Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<!-- Preset dropdown (top left) -->
+			<Frame name="PresetDropDown" inherits="UIDropDownMenuTemplate">
+				<Size x="120" y="22"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset x="5" y="-30"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						UIDropDownMenu_SetWidth(120);
+						UIDropDownMenu_Initialize(this, PresetDropDown_Initialize);
+						getglobal(this:GetName().."Text"):SetText("Select Preset");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<!-- Delete Preset button (right of Preset dropdown)-->
+			<Button name="DeletePresetButton" inherits="UIPanelButtonTemplate" text="Delete Preset">
+				<Size x="90" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PresetDropDown" relativePoint="RIGHT">
+						<Offset x="0" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						DeleteSelectedPreset();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- Preset Name editbox (below Preset dropdown)-->
+			<EditBox name="PresetNameEdit" letters="32" autoFocus="false">
+				<Size x="150" y="20"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PresetDropDown" relativePoint="BOTTOMLEFT">
+						<Offset x="10" y="-10"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="8" y="20"/></Size>
+							<Anchors><Anchor point="TOPLEFT"/></Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="8" y="20"/></Size>
+							<Anchors><Anchor point="TOPRIGHT"/></Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size><AbsDimension x="10" y="20"/></Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						this:SetText("Preset name");
+						this:SetTextColor(0.5, 0.5, 0.5);
+					</OnLoad>
+					<OnEditFocusGained>
+						if this:GetText() == "Preset name" then
+							this:SetText("");
+							this:SetTextColor(1, 1, 1);
+						end
+					</OnEditFocusGained>
+					<OnEditFocusLost>
+						if this:GetText() == "" then
+							this:SetText("Preset name");
+							this:SetTextColor(0.5, 0.5, 0.5);
+						end
+					</OnEditFocusLost>
+					<OnEscapePressed>
+						this:ClearFocus();
+					</OnEscapePressed>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<!-- Save Preset button (to the right of Preset Name editbox) -->
+			<Button name="SavePresetButton" inherits="UIPanelButtonTemplate" text="Save Preset">
+				<Size x="90" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="PresetNameEdit" relativePoint="RIGHT">
+						<Offset x="10" y="0"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						SaveCurrentListAsPreset();
+					</OnClick>
+				</Scripts>
+			</Button>
+	
+			<ScrollFrame name="BotNamesScrollFrame" inherits="UIPanelScrollFrameTemplate">
+				<Size x="340" y="160"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="PresetNameEdit" relativePoint="BOTTOMLEFT">
+						<Offset x="0" y="-10"/>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBG">
+							<Anchors>
+								<Anchor point="TOPLEFT" x="-5" y="5"/>
+								<Anchor point="BOTTOMRIGHT" x="27" y="-5"/>
+							</Anchors>
+							<Color r="0" g="0" b="0" a="0.5"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<ScrollChild>
+					<EditBox name="BotNamesEdit" multiLine="true" letters="2048" autoFocus="false">
+						<Size x="310" y="160"/> 
+						<Scripts>
+							<OnLoad>
+								this:SetText("Enter bot names, one per line\nExample:\nHealbot\nTankbot\nMagebot");
+								this:SetTextColor(0.6, 0.6, 0.6);
+								BotNamesScrollFrame:SetScrollChild(this);
+							</OnLoad>
+							<OnTextChanged>
+								BotNamesScrollFrame:UpdateScrollChildRect();
+							</OnTextChanged>
+							<OnCursorChanged>
+								ScrollingEdit_OnCursorChanged(arg1, arg2, arg3, arg4);
+							</OnCursorChanged>
+							<OnUpdate>
+								if (this.scrollCursorChanged) then
+									local parent = this:GetParent();
+									if (parent and parent.GetVerticalScrollRange) then
+										ScrollingEdit_OnUpdate(this);
+									end
+								end
+							</OnUpdate>
+							<OnEditFocusGained>
+								if this:GetText() == "Enter bot names, one per line\nExample:\nHealbot\nTankbot\nMagebot" then
+									this:SetText("");
+									this:SetTextColor(1, 1, 1);
+								end
+							</OnEditFocusGained>
+							<OnEditFocusLost>
+								if this:GetText() == "" then
+									this:SetText("Enter bot names, one per line\nExample:\nHealbot\nTankbot\nMagebot");
+									this:SetTextColor(0.6, 0.6, 0.6);
+								end
+							</OnEditFocusLost>
+							<OnEscapePressed>
+								this:ClearFocus();
+							</OnEscapePressed>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+				</ScrollChild>
+			</ScrollFrame>
+
+			<!-- Load button (fixed position below the edit box, independent of content) -->
+			<Button name="LoadBotNamesButton" inherits="UIPanelButtonTemplate" text="Load">
+				<Size x="70" y="22"/>
+				<Anchors>
+					<!-- Anchor to the edit box's BOTTOMLEFT, not to the text inside -->
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset x="15" y="15"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LoadBotNamesFromEditBox();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<!-- Close button (bottom right) -->
+			<Button name="CloseBotListFrame" inherits="UIPanelButtonTemplate" text="Close">
+				<Size x="70" y="22"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset x="-15" y="15"/>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						VBotsBotListFrame:Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+
+		<Scripts>
+			<OnLoad>
+				this:Hide();
+			</OnLoad>
+			<OnEscapePressed>
+				this:Hide();
+			</OnEscapePressed>
 		</Scripts>
 	</Frame>
 </Ui>

@@ -592,46 +592,185 @@ function DeleteGearTemplate()
     StaticPopup_Show("CONFIRM_DELETE_GEAR_TEMPLATE", name)
 end
 
--- Spec delete popup
-VBots_SpecToDelete = nil
+-- Preset storage (global saved variable)
+VBotsDB.botPresets = VBotsDB.botPresets or {}
+local selectedPresetName = nil
 
-StaticPopupDialogs["CONFIRM_DELETE_SPEC_TEMPLATE"] = {
-    text = "Are you sure you want to delete spec template \"%s\"?",
-    button1 = "Yes",
-    button2 = "No",
-    OnAccept = function()
-        if VBots_SpecToDelete then
-            SendChatMessage(".character premade deletespec " .. VBots_SpecToDelete)
-            VBots_SpecToDelete = nil
-            selectedSpecTemplateId = nil
-            local dropdown = getglobal("vbotsSpecDropDown")
-            if dropdown then
-                local textField = getglobal(dropdown:GetName() .. "Text")
-                if textField then
-                    textField:SetText("Select Spec Template")
-                end
+-- Helper: get text from the popup edit box and split into lines
+function GetBotNamesFromEditBox()
+    local editBox = getglobal("BotNamesEdit")
+    if not editBox then return {} end
+    local text = editBox:GetText()
+    if type(text) ~= "string" then return {} end
+
+    local names = {}
+    local from = 1
+    local len = string.len(text)
+
+    while from <= len do
+        -- Find next newline (Unix \n or Windows \r\n)
+        local s, e = string.find(text, "[\r\n]", from)
+        if not s then
+            -- Last line
+            local line = string.sub(text, from)
+            local trimmed = string.gsub(line, "^%s*(.-)%s*$", "%1")
+            if trimmed ~= "" then
+                table.insert(names, trimmed)
             end
-            SpecTemplateButtonClick()
+            break
         end
-    end,
-    OnCancel = function()
-        VBots_SpecToDelete = nil
-    end,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-}
+        -- Extract line between 'from' and the newline
+        local line = string.sub(text, from, s - 1)
+        local trimmed = string.gsub(line, "^%s*(.-)%s*$", "%1")
+        if trimmed ~= "" then
+            table.insert(names, trimmed)
+        end
+        from = e + 1
+    end
+    return names
+end
 
-function DeleteSpecTemplate()
-    if not selectedSpecTemplateId then
-        DEFAULT_CHAT_FRAME:AddMessage("No spec template selected. Please select one from the Spec dropdown.")
+-- Load the current edit box content as bot commands
+function LoadBotNamesFromEditBox()
+    local names = GetBotNamesFromEditBox()
+    if table.getn(names) == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("No bot names entered.")
         return
     end
-    local name = specTemplates[selectedSpecTemplateId]
-    if not name then
-        DEFAULT_CHAT_FRAME:AddMessage("Error: Could not find template name.")
+    -- Use command queue to send .partybot load for each name
+    CommandQueue.commands = {}
+    CommandQueue.timer = 0
+    for _, botName in ipairs(names) do
+        QueueCommand(".partybot load " .. botName)
+    end
+    DEFAULT_CHAT_FRAME:AddMessage("Queued " .. table.getn(names) .. " bot(s) for loading.")
+end
+
+-- Save current edit box content as a preset
+function SaveCurrentListAsPreset()
+    local presetNameEdit = getglobal("PresetNameEdit")
+    if not presetNameEdit then return end
+    local presetName = presetNameEdit:GetText()
+    if not presetName or presetName == "" or presetName == "Preset name" then
+        DEFAULT_CHAT_FRAME:AddMessage("Please enter a preset name.")
         return
     end
-    VBots_SpecToDelete = name
-    StaticPopup_Show("CONFIRM_DELETE_SPEC_TEMPLATE", name)
+    local names = GetBotNamesFromEditBox()
+    if table.getn(names) == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("No bot names to save.")
+        return
+    end
+
+    -- Ensure VBotsDB and botPresets exist
+    if not VBotsDB then
+        VBotsDB = {}
+    end
+    if not VBotsDB.botPresets then
+        VBotsDB.botPresets = {}
+    end
+
+    VBotsDB.botPresets[presetName] = names
+    DEFAULT_CHAT_FRAME:AddMessage("Preset '" .. presetName .. "' saved with " .. table.getn(names) .. " bot(s).")
+
+    -- Refresh the dropdown
+    local dropdown = getglobal("PresetDropDown")
+    if dropdown then
+        UIDropDownMenu_Initialize(dropdown, PresetDropDown_Initialize)
+        UIDropDownMenu_SetText("Select Preset", dropdown)
+    end
+end
+
+-- Populate the preset dropdown
+function PresetDropDown_Initialize()
+    local info = {}
+    info.text = "Presets"
+    info.notClickable = 1
+    info.isTitle = 1
+    UIDropDownMenu_AddButton(info)
+
+    if not VBotsDB or not VBotsDB.botPresets then
+        info = {}
+        info.text = "No presets"
+        info.disabled = 1
+        UIDropDownMenu_AddButton(info)
+        return
+    end
+
+    for name, _ in pairs(VBotsDB.botPresets) do
+        info = {}
+        info.text = name
+        info.func = SelectPreset   -- function name, not closure
+        info.arg1 = name           -- pass preset name as argument
+        UIDropDownMenu_AddButton(info)
+    end
+end
+
+-- Called when a preset is selected from dropdown
+function SelectPreset(name)
+    if not name then return end
+    selectedPresetName = name
+    local dropdown = getglobal("PresetDropDown")
+    if dropdown then
+        UIDropDownMenu_SetText(name, dropdown)
+    end
+    -- Automatically load the preset's bot names
+    LoadSelectedPreset()
+end
+
+-- Load the selected preset into the edit box
+function LoadSelectedPreset()
+    if not VBotsDB or not VBotsDB.botPresets then
+        DEFAULT_CHAT_FRAME:AddMessage("No presets saved yet.")
+        return
+    end
+    if not selectedPresetName then
+        DEFAULT_CHAT_FRAME:AddMessage("No preset selected. Choose one from the dropdown.")
+        return
+    end
+    local names = VBotsDB.botPresets[selectedPresetName]
+    if not names then
+        DEFAULT_CHAT_FRAME:AddMessage("Preset not found.")
+        return
+    end
+    local editBox = getglobal("BotNamesEdit")
+    if editBox then
+        editBox:SetText(table.concat(names, "\n"))
+        editBox:SetTextColor(1, 1, 1)
+        DEFAULT_CHAT_FRAME:AddMessage("Loaded preset '" .. selectedPresetName .. "' into editor.")
+    end
+end
+
+function DeleteSelectedPreset()
+    if not selectedPresetName then
+        DEFAULT_CHAT_FRAME:AddMessage("No preset selected. Choose one from the dropdown first.")
+        return
+    end
+    
+    if not VBotsDB or not VBotsDB.botPresets then
+        DEFAULT_CHAT_FRAME:AddMessage("No presets to delete.")
+        return
+    end
+    
+    if not VBotsDB.botPresets[selectedPresetName] then
+        DEFAULT_CHAT_FRAME:AddMessage("Preset '" .. selectedPresetName .. "' not found.")
+        return
+    end
+    
+    VBotsDB.botPresets[selectedPresetName] = nil
+    DEFAULT_CHAT_FRAME:AddMessage("Preset '" .. selectedPresetName .. "' deleted.")
+    
+    selectedPresetName = nil
+    
+    -- Optional: clear the edit box
+    local editBox = getglobal("BotNamesEdit")
+    if editBox then
+        editBox:SetText("")
+        editBox:SetTextColor(0.6, 0.6, 0.6)
+    end
+    
+    local dropdown = getglobal("PresetDropDown")
+    if dropdown then
+        UIDropDownMenu_SetText("Select Preset", dropdown)
+        UIDropDownMenu_Initialize(dropdown, PresetDropDown_Initialize)
+    end
 end
